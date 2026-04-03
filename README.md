@@ -405,7 +405,6 @@ Se encontrar problemas, abra uma issue no repositório.
 ## 🔄 Próximas Melhorias
 
 - [ ] Autenticação com Google/GitHub
-- [ ] Dark mode
 - [ ] Exportar tarefas (PDF, CSV)
 - [ ] Notificações de tarefas vencidas
 - [ ] Categorias/Labels para tarefas
