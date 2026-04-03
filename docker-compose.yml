@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-task_manager}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./
+      dockerfile: ./apps/backend/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/task_manager}
+      JWT_SECRET: ${JWT_SECRET:-sua-chave-secreta-super-segura-mude-em-producao}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3001}
+    ports:
+      - "${PORT:-3001}:${PORT:-3001}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./apps/frontend/Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgres_data: # O Docker gerenciará o local físico automaticamente

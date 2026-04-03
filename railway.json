@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/railwayapp/railway/main/schema.json",
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "healthcheckPath": "/",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
